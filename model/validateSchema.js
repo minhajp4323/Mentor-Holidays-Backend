@@ -11,8 +11,8 @@ export const joiPropertySchema = Joi.object({
   title: Joi.string(),
   location: Joi.string(),
   price: Joi.number(),
-  images: Joi.string(),
-  // images: Joi.array().items(Joi.string()),
+  // images: Joi.string(),
+  images: Joi.array().items(Joi.string()),
   description: Joi.string(),
   category: Joi.string(),
 });

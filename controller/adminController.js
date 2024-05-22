@@ -65,7 +65,7 @@ export const addProperties = async (req, res) => {
   if (error) {
     res
       .status(400)
-      .json({ status: "Error", message: error.details [0].message });
+      .json({ status: "Error", message: error.details[0].message });
   } else {
     const addedProperty = await properties.create({
       title,
