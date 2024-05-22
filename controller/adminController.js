@@ -8,7 +8,7 @@ export const login = async (req, res) => {
   const { username, password } = req.body;
   if (
     username === process.env.ADMIN_USERNAME &&
-    password === process.env.ADMIN_USERNAME
+    password === process.env.ADMIN_PASSWORD
   ) {
     const token = jwt.sign(
       { username: username },
@@ -17,7 +17,7 @@ export const login = async (req, res) => {
     res.status(200).json({
       status: "Success",
       message: "Succesfully logged in",
-      token: token,
+      data: token,
     });
   } else {
     res.status(400).json({ status: "Error", message: "incorrect admin ID" });
