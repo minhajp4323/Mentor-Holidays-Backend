@@ -14,7 +14,7 @@ export const login = async (req, res) => {
       { username: username },
       process.env.ADMIN_ACCESS_TOKEN
     );
-    res.status(200).json({
+    return res.status(200).json({
       status: "Success",
       message: "Succesfully logged in",
       data: token,
