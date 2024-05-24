@@ -4,37 +4,48 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
+
   const { value, error } = joiUserSchema.validate(req.body);
-  const { username, email, phonenumber, password } = value;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  console.log("value:", value);
 
   if (error) {
-    res.status(400).json({ error: "Invalid user input, Check the input" });
-  }
-  const existingUser = await User.findOne({
-    username: username,
-  });
-  console.log(`Existing user is ${existingUser}`);
-  if (existingUser) {
-    res.status(400).json({ error: "Username already taken" });
-    return;
+    return res.status(400).json({ error: "Invalid user input. Check the input." });
   }
 
-  const userData = new User({
-    username: username,
-    email: email,
-    phonenumber: phonenumber,
-    password: hashedPassword,
-  });
-  await userData.save();
-  console.log("New User is ", userData);
-  res.status(200).json({
-    status: "Success",
-    message: "User successfully registered",
-    data: userData,
-  });
+  const { username, email, phonenumber, password } = value;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const existingUser = await User.findOne({ username: username });
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already taken." });
+    }
+
+    const existingEmail = await User.findOne({ email: email });
+    if (existingEmail) {
+      return res.status(400).json({ error: "Email already registered." });
+    }
+
+    const userData = new User({
+      username,
+      email,
+      phonenumber,
+      password: hashedPassword,
+    });
+
+    await userData.save();
+
+    res.status(201).json({
+      status: "Success",
+      message: "User successfully registered.",
+      data: userData,
+    });
+  } catch (err) {
+    console.error("Error during user registration:", err);
+    res.status(500).json({ error: err.message });
+  }
 };
+
 
 export const login = async (req, res) => {
   const { value, error } = joiUserSchema.validate(req.body);

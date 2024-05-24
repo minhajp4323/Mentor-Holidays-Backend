@@ -1,11 +1,13 @@
 import Joi from "joi";
 
 export const joiUserSchema = Joi.object({
-  username: Joi.string(),
-  email: Joi.string().email(),
-  phonenumber: Joi.number(),
-  password: Joi.string(),
+  username: Joi.string().min(3).max(30).required(),
+  email: Joi.string().email().required(),
+  phonenumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
+  password: Joi.string().min(6).required(),
+  confirmPassword: Joi.any().valid(Joi.ref('password')).required()
 });
+
 
 export const joiPropertySchema = Joi.object({
   title: Joi.string(),

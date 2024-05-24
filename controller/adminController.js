@@ -27,6 +27,7 @@ export const login = async (req, res) => {
 //all user
 
 export const AllUser = async (req, res) => {
+  try{
   const allUser = await users.find();
   if (!allUser) {
     res.status(404).json({
@@ -39,6 +40,9 @@ export const AllUser = async (req, res) => {
     message: "Fetched all users",
     data: allUser,
   });
+}catch(err){
+  console.log(err);
+}
 };
 
 //user by id
@@ -79,6 +83,20 @@ export const addProperties = async (req, res) => {
       status: "Success",
       message: "Added properties Successfully",
       data: addedProperty,
+    });
+  }
+};
+
+export const allProperties = async (req, res) => {
+  const allProps = await properties.find();
+  console.log(allProps)
+  if (!allProps) {
+    res.status(404).json({ status: "Error", message: "No properties found" });
+  } else {
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched all users successfully",
+      data: allProps,
     });
   }
 };
