@@ -37,7 +37,7 @@ export const AllUser = async (req, res) => {
   }
   res.status(200).json({
     status: "Success",
-    message: "Fetched all Users",
+    message: "Fetched all users",
     data: allUser,
   });
 }catch(err){
