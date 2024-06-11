@@ -4,6 +4,8 @@ import {
   addProperties,
   allProperties,
   login,
+  propertById,
+  updatePropById,
   userById,
 } from "../controller/adminController.js";
 import imageUpload from "../middlewares/imageuploader/imageUploader.js";
@@ -19,6 +21,8 @@ app
   .get("/user", AllUser)
   .get("/user/:id", userById)
   .post("/properties", imageUpload, addProperties)
-  .get("/properties", allProperties);
+  .get("/properties", allProperties)
+  .get("/properties/:id", propertById)
+  .put("/properties/:id", updatePropById);
 
 export default app;

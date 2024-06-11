@@ -4,6 +4,8 @@ const propertySchema = new mongoose.Schema({
   title: String,
   price: Number,
   location: String,
+  bedroom: String,
+  bathroom: String,
   images: [{ type: String }],
   description: String,
   category: String,

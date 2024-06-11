@@ -11,5 +11,6 @@ export const verifyAdminToken = (req, res, next) => {
       res.status(401).json({ error: "Unauthorized" });
     }
     req.username = decoded.username;
+    next();
   });
 };
