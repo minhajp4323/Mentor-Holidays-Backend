@@ -128,7 +128,7 @@ export const allProperties = async (req, res) => {
   }
 };
 
-// displaying single Property by  id
+// displaying single Property by id
 
 export const propertById = async (req, res) => {
   try {
@@ -154,25 +154,27 @@ export const propertById = async (req, res) => {
 //edit by id
 
 export const updatePropById = async (req, res) => {
-  try {
-    const { value, error } = joiPropertySchema.validate(req.body);
-    const propId = req.params.id;
-    const {
-      title,
-      price,
-      location,
-      bedroom,
-      bathroom,
-      images,
-      description,
-      category,
-    } = value;
+  const propId = req.params.id;
+  const { value, error } = joiPropertySchema.validate(req.body);
 
-    if (error) {
-      res
-        .status(404)
-        .json({ status: "Not found", message: error.details[0].message });
-    }
+  if (error) {
+    res
+      .status(404)
+      .json({ status: "Not found", message: error.details[0].message });
+  }
+
+  const {
+    title,
+    price,
+    location,
+    bedroom,
+    bathroom,
+    images,
+    description,
+    category,
+  } = value;
+
+  try {
     const updatedProduct = await properties.findByIdAndUpdate(
       propId,
       {
@@ -187,20 +189,41 @@ export const updatePropById = async (req, res) => {
           category,
         },
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
-    if (!updatedProduct) {
-      res
-        .status(404)
-        .json({ status: "Error", message: "Error while updating property" });
-    } else {
+    if (updatedProduct) {
       res.status(200).json({
         status: "Success",
         message: "Updated Successfully",
         data: updatedProduct,
       });
+    } else {
+      res.status(404).json({
+        status: "error",
+        message: "no property found",
+      });
     }
   } catch (error) {
     console.error(error);
+  }
+};
+//delete porperty
+
+export const deleteProperty = async (req, res) => {
+  const propId = req.params.id;
+  if (!propId) {
+    res.status(404).json({ status: "Not found", message: "Product not found" });
+  }
+  const deletedProperty = await properties.findByIdAndDelete(propId);
+
+  if (!deletedProperty) {
+    res
+      .status(404)
+      .json({ status: "Error", message: "Error while deleting property" });
+  } else {
+    res.status(404).json({
+      status: "Success",
+      message: "Successfully deleted the property",
+    });
   }
 };

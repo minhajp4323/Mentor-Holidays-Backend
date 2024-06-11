@@ -3,26 +3,28 @@ import {
   AllUser,
   addProperties,
   allProperties,
+  deleteProperty,
   login,
   propertById,
   updatePropById,
   userById,
 } from "../controller/adminController.js";
 import imageUpload from "../middlewares/imageuploader/imageUploader.js";
-import { verifyAdminToken } from "../middlewares/AdminAuth.js";
+// import { verifyAdminToken } from "../middlewares/AdminAuth.js";
 
 const app = express.Router();
 
 app
   .post("/login", login)
 
-  .use(verifyAdminToken)
+  // .use(verifyAdminToken)
 
   .get("/user", AllUser)
   .get("/user/:id", userById)
   .post("/properties", imageUpload, addProperties)
   .get("/properties", allProperties)
   .get("/properties/:id", propertById)
-  .put("/properties/:id", updatePropById);
+  .put("/properties/:id", imageUpload, updatePropById)
+  .delete("/properties/:id", deleteProperty);
 
 export default app;
