@@ -122,7 +122,7 @@ export const propertyById = async (req, res) => {
     if (!propById) {
       res.status(404).json({
         status: "Not found",
-        message: "Porperty ni tofund in the data base",
+        message: "Porperty not found in the data base",
       });
     } else {
       res.status(200).json({
@@ -135,3 +135,4 @@ export const propertyById = async (req, res) => {
     console.error(error);
   }
 };
+
