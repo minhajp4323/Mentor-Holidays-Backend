@@ -48,11 +48,8 @@ export const registerUser = async (req, res) => {
 // userlogin
 
 export const login = async (req, res) => {
+  const { value, error } = joiUserSchema.validate(req.body);
   try {
-    const { value, error } = joiUserSchema.validate(req.body);
-    if (error) {
-      console.error(error.message);
-    }
     const { username, password } = value;
     const user = await User.findOne({
       username: username,
@@ -136,3 +133,18 @@ export const propertyById = async (req, res) => {
   }
 };
 
+// single user
+
+export const currentUser = async (req, res) => {
+  const userId = req.params.id
+  const userById = await User.findById(userId);
+  if (!userById) {
+    res.status(404).json({ status: "Not found", message: "User not found" });
+  } else {
+    res.status(200).json({
+      status: "Success",
+      message: "User details fetched successfully",
+      data: userById,
+    });
+  }
+};
