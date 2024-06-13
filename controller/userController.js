@@ -1,27 +1,24 @@
 import { joiUserSchema } from "../model/validateSchema.js";
 import User from "../model/userSchema.js";
+import Property from "../model/productSchema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import Property from "../model/productSchema.js";
+import mongoose from "mongoose";
 
-// registering user
-
+// Register user
 export const registerUser = async (req, res) => {
   const { value, error } = joiUserSchema.validate(req.body);
   if (error) {
-    return res
-      .status(400)
-      .json({ error: "Invalid user input. Check the input." });
+    return res.status(400).json({ error: error.details[0].message });
   }
   const { username, email, phonenumber, password } = value;
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const existingUser = await User.findOne({ username: username });
+    const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(400).json({ error: "Username already taken." });
     }
-    const existingEmail = await User.findOne({ email: email });
+    const existingEmail = await User.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ error: "Email already registered." });
     }
@@ -31,9 +28,7 @@ export const registerUser = async (req, res) => {
       phonenumber,
       password: hashedPassword,
     });
-
     await userData.save();
-
     res.status(201).json({
       status: "Success",
       message: "User successfully registered.",
@@ -45,34 +40,29 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// userlogin
-
+// User login
 export const login = async (req, res) => {
   const { value, error } = joiUserSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  const { username, password } = value;
   try {
-    const { username, password } = value;
-    const user = await User.findOne({
-      username: username,
-    });
-
+    const user = await User.findOne({ username: username });
     if (!user) {
-      res.status(404).json({
-        status: "Not found",
-        message: "User Not found",
-      });
+      return res
+        .status(404)
+        .json({ status: "Not found", message: "User not found" });
     }
     if (!password || !user.password) {
-      res.status(400).json("No password entered");
+      return res.status(400).json({ error: "No password entered" });
     }
-
     const passwordCheck = await bcrypt.compare(password, user.password);
     if (!passwordCheck) {
-      res.status(400).json({
-        status: "Error",
-        message: "Incorrect password",
-      });
+      return res
+        .status(400)
+        .json({ status: "Error", message: "Incorrect password" });
     }
-
     const token = jwt.sign(
       { username: user.username },
       process.env.USER_ACCESS_TOKEN
@@ -80,73 +70,127 @@ export const login = async (req, res) => {
     res.status(200).json({
       status: "Success",
       message: "Successfully logged in",
-      token: token,
+      token,
       data: user,
     });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
 
-// display all properties
-
+// Display all properties
 export const allProperty = async (req, res) => {
   try {
     const allProps = await Property.find();
-    if (!allProps) {
-      res
+    if (!allProps.length) {
+      return res
         .status(404)
         .json({ status: "Not found", message: "No properties to display" });
-    } else {
-      res.status(200).json({
-        status: "Success",
-        message: "Fetched all properties",
-        data: allProps,
-      });
     }
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched all properties",
+      data: allProps,
+    });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// display single propertyById
-
+// Display single property by ID
 export const propertyById = async (req, res) => {
   try {
     const propId = req.params.id;
     const propById = await Property.findById(propId);
-
     if (!propById) {
-      res.status(404).json({
+      return res.status(404).json({
         status: "Not found",
-        message: "Porperty not found in the data base",
-      });
-    } else {
-      res.status(200).json({
-        status: "Success",
-        message: "Succesfully fetched proprty by id",
-        data: propById,
+        message: "Property not found in the database",
       });
     }
+    res.status(200).json({
+      status: "Success",
+      message: "Successfully fetched property by ID",
+      data: propById,
+    });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: error.message });
   }
 };
 
-// single user
-
+// Get current user by ID
 export const currentUser = async (req, res) => {
-  const userId = req.params.id
-  const userById = await User.findById(userId);
-  if (!userById) {
-    res.status(404).json({ status: "Not found", message: "User not found" });
-  } else {
+  const userId = req.params.id;
+  try {
+    const userById = await User.findById(userId);
+    if (!userById) {
+      return res
+        .status(404)
+        .json({ status: "Not found", message: "User not found" });
+    }
     res.status(200).json({
       status: "Success",
       message: "User details fetched successfully",
       data: userById,
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 };
 
+// Add property to wishlist
+export const addToWishlist = async (req, res) => {
+  const userId = req.params.id;
+  const { propertyId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "Not found", message: "User not found" });
+    }
+    if (!user.wishlist.includes(propertyId)) {
+      user.wishlist.push(propertyId);
+      await user.save();
+      res
+        .status(200)
+        .json({ status: "Success", message: "Property added to wishlist" });
+    } else {
+      res
+        .status(400)
+        .json({ status: "Error", message: "Property already in wishlist" });
+    }
+  } catch (error) {
+    console.error("Error adding property to wishlist:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
+//delete from wishlist
+
+
+
+// Get wishlist properties
+export const getWishlist = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId).populate("wishlist");
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "Not found", message: "User not found" });
+    }
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched wishlist properties",
+      data: user.wishlist,
+    });
+  } catch (error) {
+    console.error("Error fetching wishlist properties:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

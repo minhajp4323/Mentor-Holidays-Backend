@@ -11,5 +11,5 @@ const propertySchema = new mongoose.Schema({
   category: String,
 });
 
-const Property = mongoose.model("property", propertySchema);
+const Property = mongoose.model("Property", propertySchema);
 export default Property;

@@ -1,7 +1,9 @@
 import express from "express";
 import {
+  addToWishlist,
   allProperty,
   currentUser,
+  getWishlist,
   login,
   propertyById,
   registerUser,
@@ -16,6 +18,8 @@ app
   // .use(verifyUserToken)
   .get("/properties", allProperty)
   .get("/properties/:id", propertyById)
-  .get("/user/:id", currentUser);
+  .get("/user/:id", currentUser)
+  .post("/wishlist/:id", addToWishlist)
+  .get("/user/:id/wishlist", getWishlist);
 
 export default app;

@@ -2,10 +2,10 @@ import Joi from "joi";
 
 export const joiUserSchema = Joi.object({
   username: Joi.string().min(3).max(30).required(),
-  email: Joi.string().email().required(),
-  phonenumber: Joi.string().min(10).max(15).required(),
+  email: Joi.string().email(),
+  phonenumber: Joi.number().min(10),
   password: Joi.string().min(6).required(),
-  confirmPassword: Joi.any().valid(Joi.ref('password')).required().messages({'any.only': 'Passwords do not match'})
+  confirmPassword: Joi.any().valid(Joi.ref('password')).messages({'any.only': 'Passwords do not match'})
 });
 
 
