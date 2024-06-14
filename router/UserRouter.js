@@ -21,7 +21,7 @@ app
   .get("/properties/:id", propertyById)
   .get("/user/:id", currentUser)
   .post("/wishlist/:id", addToWishlist)
-  .get("/wishlist/:id", getWishlist)
   .delete("/wishlist/:id", removeFromWishlist)
+  .get("/wishlist/:id", getWishlist)
 
 export default app;

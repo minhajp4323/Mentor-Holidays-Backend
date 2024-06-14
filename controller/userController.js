@@ -196,11 +196,11 @@ export const removeFromWishlist = async (req, res) => {
 };
 
 // Get wishlist properties
-
 export const getWishlist = async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findById(userId).populate("wishlist");
+    const user = await User.findById(userId).populate("wishlist")
+    console.log(user)
     if (!user) {
       return res
         .status(404)
@@ -216,3 +216,4 @@ export const getWishlist = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
