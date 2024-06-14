@@ -122,6 +122,7 @@ export const propertyById = async (req, res) => {
 };
 
 // Get current user by ID
+
 export const currentUser = async (req, res) => {
   const userId = req.params.id;
   try {
@@ -143,6 +144,7 @@ export const currentUser = async (req, res) => {
 };
 
 // Add property to wishlist
+
 export const addToWishlist = async (req, res) => {
   const userId = req.params.id;
   const { propertyId } = req.body;
@@ -170,11 +172,31 @@ export const addToWishlist = async (req, res) => {
   }
 };
 
-//delete from wishlist
+//remove from wishlist
 
-
+export const removeFromWishlist = async (req, res) => {
+  const userId = req.params.id;
+  const { propertyId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "Not found", message: "User not found" });
+    }
+    user.wishlist = user.wishlist.filter((id) => id.toString() !== propertyId);
+    await user.save();
+    res
+      .status(200)
+      .json({ status: "Success", message: "Property removed from wishlist" });
+  } catch (error) {
+    console.error("Error removing property from wishlist:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Get wishlist properties
+
 export const getWishlist = async (req, res) => {
   const userId = req.params.id;
   try {

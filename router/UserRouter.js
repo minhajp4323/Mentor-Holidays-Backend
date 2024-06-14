@@ -7,6 +7,7 @@ import {
   login,
   propertyById,
   registerUser,
+  removeFromWishlist,
 } from "../controller/userController.js";
 import verifyUserToken from "../middlewares/UserAuth.js";
 
@@ -20,6 +21,7 @@ app
   .get("/properties/:id", propertyById)
   .get("/user/:id", currentUser)
   .post("/wishlist/:id", addToWishlist)
-  .get("/user/:id/wishlist", getWishlist);
+  .get("/wishlist/:id", getWishlist)
+  .delete("/wishlist/:id", removeFromWishlist)
 
 export default app;
