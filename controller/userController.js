@@ -5,6 +5,12 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
+
+
+import { sendOTP } from "../utility/Mailer.js";// Adjust the import path as needed
+
+const otpStore = new Map(); // Temporary in-memory store for OTPs
+
 // Register user
 export const registerUser = async (req, res) => {
   const { value, error } = joiUserSchema.validate(req.body);
@@ -22,20 +28,52 @@ export const registerUser = async (req, res) => {
     if (existingEmail) {
       return res.status(400).json({ error: "Email already registered." });
     }
-    const userData = new User({
+
+    const otp = await sendOTP(email);
+    otpStore.set(email, otp);
+
+    const userData = {
       username,
       email,
       phonenumber,
       password: hashedPassword,
-    });
-    await userData.save();
-    res.status(201).json({
+    };
+    otpStore.set(email + '_data', userData); // Temporarily store user data
+
+    res.status(200).json({
       status: "Success",
-      message: "User successfully registered.",
-      data: userData,
+      message: "OTP sent to email. Please verify.",
     });
   } catch (err) {
     console.error("Error during user registration:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Verify OTP and complete registration
+export const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+  const storedOtp = otpStore.get(email);
+  const userData = otpStore.get(email + '_data');
+
+  if (!storedOtp || storedOtp !== otp) {
+    return res.status(400).json({ error: "Invalid or expired OTP." });
+  }
+
+  try {
+    const newUser = new User(userData);
+    await newUser.save();
+
+    otpStore.delete(email);
+    otpStore.delete(email + '_data');
+
+    res.status(201).json({
+      status: "Success",
+      message: "User successfully registered.",
+      data: newUser,
+    });
+  } catch (err) {
+    console.error("Error during OTP verification:", err);
     res.status(500).json({ error: err.message });
   }
 };
