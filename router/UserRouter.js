@@ -5,10 +5,11 @@ import {
   currentUser,
   getWishlist,
   login,
+  payment,
   propertyById,
   registerUser,
   removeFromWishlist,
-  verifyOTP, // Import the new verifyOTP function
+  verifyOTP,
 } from "../controller/userController.js";
 import verifyUserToken from "../middlewares/UserAuth.js";
 
@@ -25,5 +26,6 @@ app
   .post("/wishlist/:id", addToWishlist)
   .delete("/wishlist/:id", removeFromWishlist)
   .get("/wishlist/:id", getWishlist)
+  .post("/payment", payment);
 
 export default app;

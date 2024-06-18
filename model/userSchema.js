@@ -6,7 +6,8 @@ const userSchema = new mongoose.Schema(
     email: String,
     phonenumber: String,
     password: String,
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "wishlist" }],
+    bookings:[{type: mongoose.Schema.Types.ObjectId, ref: "bookings"}]
   },
   { timestamps: true }
 );

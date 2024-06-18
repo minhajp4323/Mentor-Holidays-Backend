@@ -4,12 +4,13 @@ import Property from "../model/productSchema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import Booking from "../model/BookingSchema.js";
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
+import { sendOTP } from "../utility/Mailer.js";
 
-
-import { sendOTP } from "../utility/Mailer.js";// Adjust the import path as needed
-
-const otpStore = new Map(); // Temporary in-memory store for OTPs
+const otpStore = new Map();
 
 // Register user
 export const registerUser = async (req, res) => {
@@ -38,7 +39,7 @@ export const registerUser = async (req, res) => {
       phonenumber,
       password: hashedPassword,
     };
-    otpStore.set(email + '_data', userData); // Temporarily store user data
+    otpStore.set(email + "_data", userData);
 
     res.status(200).json({
       status: "Success",
@@ -54,7 +55,7 @@ export const registerUser = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
   const storedOtp = otpStore.get(email);
-  const userData = otpStore.get(email + '_data');
+  const userData = otpStore.get(email + "_data");
 
   if (!storedOtp || storedOtp !== otp) {
     return res.status(400).json({ error: "Invalid or expired OTP." });
@@ -65,7 +66,7 @@ export const verifyOTP = async (req, res) => {
     await newUser.save();
 
     otpStore.delete(email);
-    otpStore.delete(email + '_data');
+    otpStore.delete(email + "_data");
 
     res.status(201).json({
       status: "Success",
@@ -237,8 +238,8 @@ export const removeFromWishlist = async (req, res) => {
 export const getWishlist = async (req, res) => {
   const userId = req.params.id;
   try {
-    const user = await User.findById(userId).populate("wishlist")
-    console.log(user)
+    const user = await User.findById(userId).populate("wishlist");
+    console.log(user);
     if (!user) {
       return res
         .status(404)
@@ -255,3 +256,20 @@ export const getWishlist = async (req, res) => {
   }
 };
 
+//create order and payment
+
+export const payment = async (req, res) => {
+  const razorpay = new Razorpay({
+    key_id: process.env.RAZOR_PAY_KEY_ID,
+    key_secret: process.env.RAZOR_PAY_KEY_SECRET,
+  });
+  const { amount, currency, receipt } = req.body;
+  try {
+    const payment = await razorpay.orders.create({ amount, currency, receipt });
+    return res
+      .status(200)
+      .json({ status: "Success", message: "Payment initiated", data: payment });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
