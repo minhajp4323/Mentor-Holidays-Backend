@@ -8,6 +8,7 @@ import Booking from "../model/BookingSchema.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
+
 import { sendOTP } from "../utility/Mailer.js";
 
 const otpStore = new Map();
@@ -256,20 +257,42 @@ export const getWishlist = async (req, res) => {
   }
 };
 
-//create order and payment
-
+//create booking and payment
 export const payment = async (req, res) => {
   const razorpay = new Razorpay({
     key_id: process.env.RAZOR_PAY_KEY_ID,
     key_secret: process.env.RAZOR_PAY_KEY_SECRET,
   });
-  const { amount, currency, receipt } = req.body;
+  const { amount, currency, receipt, propertyId, checkInDate, checkOutDate, guestNumber, userId } = req.body;
+
   try {
     const payment = await razorpay.orders.create({ amount, currency, receipt });
-    return res
-      .status(200)
-      .json({ status: "Success", message: "Payment initiated", data: payment });
+
+    // Create a new booking
+    const newBooking = new Booking({
+      propertyName: propertyId, // Adjust according to your property schema
+      bookingId: payment.id,
+      checkInDate,
+      checkOutDate,
+      numberOfGuests: guestNumber,
+      amount,
+      currency,
+      paymentDate: new Date(),
+      receipt,
+      user: userId,
+      property: propertyId,
+    });
+
+    await newBooking.save();
+
+    // Update user with the new booking
+    await User.findByIdAndUpdate(userId, {
+      $push: { bookings: newBooking._id }
+    });
+
+    return res.status(200).json({ status: "Success", message: "Payment initiated", data: payment });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
