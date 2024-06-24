@@ -8,7 +8,6 @@ import Booking from "../model/BookingSchema.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
-
 import { sendOTP } from "../utility/Mailer.js";
 
 const otpStore = new Map();
@@ -263,14 +262,22 @@ export const payment = async (req, res) => {
     key_id: process.env.RAZOR_PAY_KEY_ID,
     key_secret: process.env.RAZOR_PAY_KEY_SECRET,
   });
-  const { amount, currency, receipt, propertyId, checkInDate, checkOutDate, guestNumber, userId } = req.body;
+  const {
+    amount,
+    currency,
+    receipt,
+    propertyId,
+    checkInDate,
+    checkOutDate,
+    guestNumber,
+    userId,
+  } = req.body;
 
   try {
     const payment = await razorpay.orders.create({ amount, currency, receipt });
 
-    // Create a new booking
     const newBooking = new Booking({
-      propertyName: propertyId, // Adjust according to your property schema
+      propertyName: propertyId,
       bookingId: payment.id,
       checkInDate,
       checkOutDate,
@@ -285,14 +292,39 @@ export const payment = async (req, res) => {
 
     await newBooking.save();
 
-    // Update user with the new booking
     await User.findByIdAndUpdate(userId, {
-      $push: { bookings: newBooking._id }
+      $push: { bookings: newBooking._id },
     });
 
-    return res.status(200).json({ status: "Success", message: "Payment initiated", data: payment });
+    return res
+      .status(200)
+      .json({ status: "Success", message: "Payment initiated", data: payment });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+//get booking
+
+export const getBooking = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const user = await User.findById(userId).populate({
+      path: "bookings",
+      populate: { path: "property" },
+    });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: "Not found", message: "User not found" });
+    }
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched bookings list",
+      data: user.bookings,
+    });
+  } catch (error) {
+    console.error("Error fetching booked properties:", error);
+    res.status(500).json({ error: error.message });
+  }
+};

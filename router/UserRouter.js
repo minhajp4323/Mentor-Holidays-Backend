@@ -3,6 +3,7 @@ import {
   addToWishlist,
   allProperty,
   currentUser,
+  getBooking,
   getWishlist,
   login,
   payment,
@@ -17,7 +18,7 @@ const app = express.Router();
 
 app
   .post("/register", registerUser)
-  .post("/verifyotp", verifyOTP) // Add the OTP verification route
+  .post("/verifyotp", verifyOTP)
   .post("/login", login)
   // .use(verifyUserToken)
   .get("/properties", allProperty)
@@ -26,6 +27,7 @@ app
   .post("/wishlist/:id", addToWishlist)
   .delete("/wishlist/:id", removeFromWishlist)
   .get("/wishlist/:id", getWishlist)
-  .post("/payment", payment);
+  .post("/payment", payment)
+  .get("/booking/:id", getBooking);
 
 export default app;

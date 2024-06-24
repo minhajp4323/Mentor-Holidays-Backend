@@ -212,7 +212,7 @@ export const updatePropById = async (req, res) => {
 export const deleteProperty = async (req, res) => {
   const propId = req.params.id;
   if (!propId) {
-    res.status(404).json({ status: "Not found", message: "Product not found" });
+    res.status(404).json({ status: "Not found", message: "Product not found in db" });
   }
   const deletedProperty = await properties.findByIdAndDelete(propId);
 

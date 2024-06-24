@@ -1,17 +1,13 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
-  {
-    username: String,
-    email: String,
-    phonenumber: String,
-    password: String,
-    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Property" }],
-    bookings:[{type: mongoose.Schema.Types.ObjectId, ref: "bookings"}]
-  },
-  { timestamps: true }
-);
+const userSchema = new mongoose.Schema({
+  username: String,
+  email: String,
+  phonenumber: String,
+  password: String,
+  wishlist: [{ type: mongoose.Schema.ObjectId, ref: "Property" }],
+  bookings: [{ type: mongoose.Schema.ObjectId, ref: "Booking" }],
+});
 
-const UserModel = mongoose.model("User", userSchema);
-
-export default UserModel;
+const User = mongoose.model("User", userSchema);
+export default User;
