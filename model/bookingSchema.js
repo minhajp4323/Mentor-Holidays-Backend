@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(
   {
-    propertyName: { type: String, required: true },
+    title: { type: String },
     bookingId: { type: String, required: true },
     checkInDate: { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
@@ -27,5 +27,5 @@ const bookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Booking = mongoose.model("Booking", bookingSchema);
-export default Booking;
+const BookingModel = mongoose.model("Booking", bookingSchema);
+export default BookingModel;

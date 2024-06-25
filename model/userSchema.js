@@ -2,12 +2,18 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   username: String,
-  email: String,
+  email: {
+    type: String,
+    unique: true,
+  },
   phonenumber: String,
   password: String,
-  wishlist: [{ type: mongoose.Schema.ObjectId, ref: "Property" }],
-  bookings: [{ type: mongoose.Schema.ObjectId, ref: "Booking" }],
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Property' }],
+  bookings: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Booking' }],
 });
 
 const User = mongoose.model("User", userSchema);
+
 export default User;

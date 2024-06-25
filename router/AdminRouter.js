@@ -4,6 +4,7 @@ import {
   addProperties,
   allProperties,
   deleteProperty,
+  getAllBooking,
   login,
   propertById,
   updatePropById,
@@ -25,6 +26,7 @@ app
   .get("/properties", allProperties)
   .get("/properties/:id", propertById)
   .put("/properties/:id", imageUpload, updatePropById)
-  .delete("/properties/:id", deleteProperty);
+  .delete("/properties/:id", deleteProperty)
+  .get("/bookings", getAllBooking);
 
 export default app;

@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import users from "../model/userSchema.js";
 import { joiPropertySchema } from "../model/validateSchema.js";
 import properties from "../model/productSchema.js";
+import Booking from "../model/BookingSchema.js";
+import User from "../model/userSchema.js";
 
 //login
 export const login = async (req, res) => {
@@ -212,7 +214,9 @@ export const updatePropById = async (req, res) => {
 export const deleteProperty = async (req, res) => {
   const propId = req.params.id;
   if (!propId) {
-    res.status(404).json({ status: "Not found", message: "Product not found in db" });
+    res
+      .status(404)
+      .json({ status: "Not found", message: "Product not found in db" });
   }
   const deletedProperty = await properties.findByIdAndDelete(propId);
 
@@ -225,5 +229,48 @@ export const deleteProperty = async (req, res) => {
       status: "Success",
       message: "Successfully deleted the property",
     });
+  }
+};
+
+//get booking
+
+export const getAllBooking = async (req, res) => {
+  try {
+    const usersWithBookings = await User.find().populate({
+      path: "bookings",
+      populate: { path: "property" },
+    });
+
+    const bookingsData = usersWithBookings.map((user) => ({
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      bookings: user.bookings.map((booking) => ({
+        title: booking.title,
+        bookingId: booking.bookingId,
+        checkInDate: booking.checkInDate,
+        checkOutDate: booking.checkOutDate,
+        numberOfGuests: booking.numberOfGuests,
+        amount: booking.amount,
+        currency: booking.currency,
+        paymentDate: booking.paymentDate,
+        receipt: booking.receipt,
+        property: {
+          id: booking.property._id,
+          name: booking.property.name,
+        },
+      })),
+    }));
+    console.log(bookingsData)
+
+    // Respond with success and bookings data
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched all bookings",
+      data: bookingsData,
+    });
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

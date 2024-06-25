@@ -9,6 +9,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 
 import { sendOTP } from "../utility/Mailer.js";
+import { title } from "process";
 
 const otpStore = new Map();
 
@@ -263,21 +264,24 @@ export const payment = async (req, res) => {
     key_secret: process.env.RAZOR_PAY_KEY_SECRET,
   });
   const {
+    title,
+    bookingId,
+    checkInDate,
+    guestNumber,
+    checkOutDate,
     amount,
     currency,
     receipt,
     propertyId,
-    checkInDate,
-    checkOutDate,
-    guestNumber,
     userId,
   } = req.body;
 
   try {
     const payment = await razorpay.orders.create({ amount, currency, receipt });
+    console.log(payment);
 
     const newBooking = new Booking({
-      propertyName: propertyId,
+      title,
       bookingId: payment.id,
       checkInDate,
       checkOutDate,
@@ -291,6 +295,7 @@ export const payment = async (req, res) => {
     });
 
     await newBooking.save();
+    console.log(newBooking);
 
     await User.findByIdAndUpdate(userId, {
       $push: { bookings: newBooking._id },
@@ -300,6 +305,7 @@ export const payment = async (req, res) => {
       .status(200)
       .json({ status: "Success", message: "Payment initiated", data: payment });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
