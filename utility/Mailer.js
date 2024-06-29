@@ -1,10 +1,11 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import crypto from "crypto";
 
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -13,11 +14,12 @@ const transporter = nodemailer.createTransport({
 
 export const sendOTP = async (email) => {
   const otp = crypto.randomInt(100000, 999999).toString();
+  console.log(otp);
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: 'Your OTP Code',
+    subject: "Your OTP Code",
     text: `Your OTP code is ${otp}`,
     html: `<b>Your OTP code is ${otp}</b>`,
   };
@@ -33,9 +35,9 @@ export const sendPasswordResetEmail = async (email, token) => {
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
-    subject: 'Password Reset Request',
-    text: `You requested a password reset. Click this link to reset your password: ${resetUrl}`,
-    html: `<b>You requested a password reset. Click this link to reset your password: <a href="${resetUrl}">${resetUrl}</a></b>`,
+    subject: "Password Reset Request",
+    text: `Click this link to reset you password: ${resetUrl}`,
+    html: `<b>Click this link to reset you password: <a href="${resetUrl}">${resetUrl}</a></b>`,
   };
 
   await transporter.sendMail(mailOptions);

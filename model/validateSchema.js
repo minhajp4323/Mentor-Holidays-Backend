@@ -5,9 +5,10 @@ export const joiUserSchema = Joi.object({
   email: Joi.string().email(),
   phonenumber: Joi.number().min(10),
   password: Joi.string().min(6).required(),
-  confirmPassword: Joi.any().valid(Joi.ref('password')).messages({'any.only': 'Passwords do not match'})
+  confirmPassword: Joi.any()
+    .valid(Joi.ref("password"))
+    .messages({ "any.only": "Passwords do not match" }),
 });
-
 
 export const joiPropertySchema = Joi.object({
   title: Joi.string(),
@@ -18,4 +19,5 @@ export const joiPropertySchema = Joi.object({
   images: Joi.array().items(Joi.string()),
   description: Joi.string(),
   category: Joi.string(),
+  maxGuest: Joi.string(),
 });

@@ -7,6 +7,7 @@ import {
   getAllBooking,
   login,
   propertById,
+  totalRevenue,
   updatePropById,
   userById,
 } from "../controller/adminController.js";
@@ -27,6 +28,7 @@ app
   .get("/properties/:id", propertById)
   .put("/properties/:id", imageUpload, updatePropById)
   .delete("/properties/:id", deleteProperty)
-  .get("/bookings", getAllBooking);
+  .get("/bookings", getAllBooking)
+  .get("/total-revenue", totalRevenue);
 
 export default app;

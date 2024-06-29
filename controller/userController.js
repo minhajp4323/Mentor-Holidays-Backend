@@ -280,13 +280,14 @@ export const payment = async (req, res) => {
     const payment = await razorpay.orders.create({ amount, currency, receipt });
     console.log(payment);
 
+    const inRupees = amount/100
     const newBooking = new Booking({
       title,
       bookingId: payment.id,
       checkInDate,
       checkOutDate,
       numberOfGuests: guestNumber,
-      amount,
+      amount: inRupees,
       currency,
       paymentDate: new Date(),
       receipt,

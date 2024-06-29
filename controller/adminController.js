@@ -4,6 +4,7 @@ import { joiPropertySchema } from "../model/validateSchema.js";
 import properties from "../model/productSchema.js";
 import Booking from "../model/BookingSchema.js";
 import User from "../model/userSchema.js";
+// import BookingModel from "../model/BookingSchema.js";
 
 //login
 export const login = async (req, res) => {
@@ -81,6 +82,7 @@ export const addProperties = async (req, res) => {
       images,
       description,
       category,
+      maxGuest
     } = value;
     console.log(value);
 
@@ -98,6 +100,7 @@ export const addProperties = async (req, res) => {
         images,
         description,
         category,
+        maxGuest
       });
       res.status(200).json({
         status: "Success",
@@ -174,6 +177,7 @@ export const updatePropById = async (req, res) => {
     images,
     description,
     category,
+    maxGuest
   } = value;
 
   try {
@@ -189,6 +193,7 @@ export const updatePropById = async (req, res) => {
           images,
           description,
           category,
+          maxGuest
         },
       },
       { new: true, runValidators: true }
@@ -255,15 +260,14 @@ export const getAllBooking = async (req, res) => {
         currency: booking.currency,
         paymentDate: booking.paymentDate,
         receipt: booking.receipt,
-        property: {
-          id: booking.property._id,
-          name: booking.property.name,
-        },
+        // property: {
+        //   id: booking.property._id,
+        //   name: booking.property.name,
+        // },
       })),
     }));
-    console.log(bookingsData)
+    console.log(bookingsData);
 
-    // Respond with success and bookings data
     res.status(200).json({
       status: "Success",
       message: "Fetched all bookings",
@@ -272,5 +276,28 @@ export const getAllBooking = async (req, res) => {
   } catch (error) {
     console.error("Error fetching bookings:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+//total revenue
+
+export const totalRevenue = async (req, res) => {
+  try {
+    const totalRevenue = await Booking.aggregate([
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" },
+        },
+      },
+    ]);
+    console.log(totalRevenue);
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched the total revenue successfully",
+      data: totalRevenue,
+    });
+    console.log(totalRevenue);
+  } catch (error) {
+    res.status(500).json({ error: "Error calculating revenue" });
   }
 };
