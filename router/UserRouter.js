@@ -7,6 +7,7 @@ import {
   getWishlist,
   login,
   payment,
+  propertyByCategory,
   propertyById,
   registerUser,
   removeFromWishlist,
@@ -28,6 +29,7 @@ app
   .delete("/wishlist/:id", removeFromWishlist)
   .get("/wishlist/:id", getWishlist)
   .post("/payment", payment)
-  .get("/booking/:id", getBooking);
+  .get("/booking/:id", getBooking)
+  .get("/properties/category/:id", propertyByCategory);
 
 export default app;

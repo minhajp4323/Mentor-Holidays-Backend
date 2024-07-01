@@ -9,7 +9,7 @@ const propertySchema = new mongoose.Schema({
   images: [{ type: String }],
   description: String,
   category: String,
-  maxGuest: String  
+  maxGuest: String,
 });
 
 const Property = mongoose.model("Property", propertySchema);

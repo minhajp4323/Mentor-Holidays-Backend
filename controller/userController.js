@@ -280,7 +280,7 @@ export const payment = async (req, res) => {
     const payment = await razorpay.orders.create({ amount, currency, receipt });
     console.log(payment);
 
-    const inRupees = amount/100
+    const inRupees = amount / 100;
     const newBooking = new Booking({
       title,
       bookingId: payment.id,
@@ -332,6 +332,25 @@ export const getBooking = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching booked properties:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+//property by category
+
+export const propertyByCategory = async (req, res) => {
+  const categoryId = req.params.id;
+
+  try {
+    const properties = await Property.find({ categoryId });
+
+    if (!properties) {
+      return res.status(404).json({ message: "No properties found for this category." });
+    }
+
+    res.status(200).json({ properties });
+  } catch (error) {
+    console.error("Error fetching properties by category:", error);
     res.status(500).json({ error: error.message });
   }
 };
