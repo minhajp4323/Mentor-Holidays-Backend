@@ -257,18 +257,19 @@ export const getWishlist = async (req, res) => {
   }
 };
 
-//create booking and payment
-export const payment = async (req, res) => {
-  const razorpay = new Razorpay({
-    key_id: process.env.RAZOR_PAY_KEY_ID,
-    key_secret: process.env.RAZOR_PAY_KEY_SECRET,
-  });
+const razorpay = new Razorpay({
+  key_id: process.env.RAZOR_PAY_KEY_ID,
+  key_secret: process.env.RAZOR_PAY_KEY_SECRET,
+});
+
+// create payment
+
+export const payment = async (req, res, next) => {
   const {
     title,
-    bookingId,
     checkInDate,
-    guestNumber,
     checkOutDate,
+    guestNumber,
     amount,
     currency,
     receipt,
@@ -276,40 +277,179 @@ export const payment = async (req, res) => {
     userId,
   } = req.body;
 
+  if (
+    !title ||
+    !checkInDate ||
+    !checkOutDate ||
+    !guestNumber ||
+    !amount ||
+    !currency ||
+    !receipt ||
+    !propertyId ||
+    !userId
+  ) {
+    console.error("Missing parameters in request body", req.body);
+    return res.status(400).json({
+      status: "error",
+      message: "Missing required parameters",
+    });
+  }
+
   try {
     const payment = await razorpay.orders.create({ amount, currency, receipt });
-    console.log(payment);
+    res.json({
+      status: "success",
+      message: "Payment initiated",
+      data: payment,
+    });
+  } catch (error) {
+    console.error("Error in Payment processing:", error);
+    next(new Error(error.message));
+  }
+};
 
-    const inRupees = amount / 100;
+// const isDateOverlap = (existingBooking, newBooking) => {
+//   const existingStart = new Date(existingBooking.checkInDate);
+//   const existingEnd = new Date(existingBooking.checkOutDate);
+//   const newStart = new Date(newBooking.checkInDate);
+//   const newEnd = new Date(newBooking.checkOutDate);
+
+//   return (newStart < existingEnd && newEnd > existingStart);
+// };
+
+export const createBooking = async (req, res) => {
+  const {
+    title,
+    checkInDate,
+    checkOutDate,
+    guestNumber,
+    amount,
+    currency,
+    receipt,
+    propertyId,
+    userId,
+    paymentId,
+    orderId,
+  } = req.body;
+
+  try {
+    // // Check for overlapping bookings
+    // const existingBookings = await Booking.find({ property: propertyId });
+    // for (let booking of existingBookings) {
+    //   if (isDateOverlap(booking, { checkInDate, checkOutDate })) {
+    //     return res.status(400).json({
+    //       status: "error",
+    //       message: "Property already booked for the selected dates",
+    //     });
+    //   }
+    // }
+
     const newBooking = new Booking({
       title,
-      bookingId: payment.id,
+      bookingId: orderId,
       checkInDate,
       checkOutDate,
       numberOfGuests: guestNumber,
-      amount: inRupees,
+      amount,
       currency,
       paymentDate: new Date(),
       receipt,
       user: userId,
       property: propertyId,
+      paymentId,
     });
 
     await newBooking.save();
-    console.log(newBooking);
 
     await User.findByIdAndUpdate(userId, {
       $push: { bookings: newBooking._id },
     });
 
-    return res
-      .status(200)
-      .json({ status: "Success", message: "Payment initiated", data: payment });
+    res.status(201).json({
+      status: "success",
+      message: "Booking created successfully",
+      data: newBooking,
+      payment_id: paymentId,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
+    console.error("Error creating booking:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Booking creation failed",
+    });
   }
 };
+
+// const razorpay = new Razorpay({
+//   key_id: process.env.RAZORPAY_KEY_ID,
+//   key_secret: process.env.RAZORPAY_SECRET,
+// });
+
+//create booking and payment
+
+// export const paymentAndBooking = async (req, res) => {
+//   const razorpay = new Razorpay({
+//     key_id: process.env.RAZOR_PAY_KEY_ID,
+//     key_secret: process.env.RAZOR_PAY_KEY_SECRET,
+//   });
+//   const {
+//     title,
+//     bookingId,
+//     checkInDate,
+//     guestNumber,
+//     checkOutDate,
+//     amount,
+//     currency,
+//     receipt,
+//     propertyId,
+//     userId,
+//   } = req.body;
+
+//   try {
+//     // Check for overlapping bookings
+//     const existingBookings = await Booking.find({ property: propertyId });
+//     for (let booking of existingBookings) {
+//       if (isDateOverlap(booking, { checkInDate, checkOutDate })) {
+//         return res.status(400).json({
+//           status: "Error",
+//           message: "Property already booked for the selected dates",
+//         });
+//       }
+//     }
+
+//     const payment = await razorpay.orders.create({ amount, currency, receipt });
+//     console.log(payment)
+
+//     const inRupees = amount / 100;
+//     const newBooking = new Booking({
+//       title,
+//       bookingId: payment.id,
+//       checkInDate,
+//       checkOutDate,
+//       numberOfGuests: guestNumber,
+//       amount: inRupees,
+//       currency,
+//       paymentDate: new Date(),
+//       receipt,
+//       user: userId,
+//       property: propertyId,
+//     });
+
+//     await newBooking.save();
+//     console.log(newBooking);
+
+//     await User.findByIdAndUpdate(userId, {
+//       $push: { bookings: newBooking._id },
+//     });
+
+//     return res
+//       .status(200)
+//       .json({ status: "Success", message: "Payment initiated", data: payment });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ error: error.message });
+//   }
+// };
 
 //get booking
 
@@ -320,16 +460,19 @@ export const getBooking = async (req, res) => {
       path: "bookings",
       populate: { path: "property" },
     });
+
     if (!user) {
       return res
         .status(404)
         .json({ status: "Not found", message: "User not found" });
     }
+
     res.status(200).json({
       status: "Success",
       message: "Fetched bookings list",
       data: user.bookings,
     });
+    console.log(user.bookings);
   } catch (error) {
     console.error("Error fetching booked properties:", error);
     res.status(500).json({ error: error.message });
@@ -345,7 +488,9 @@ export const propertyByCategory = async (req, res) => {
     const properties = await Property.find({ categoryId });
 
     if (!properties) {
-      return res.status(404).json({ message: "No properties found for this category." });
+      return res
+        .status(404)
+        .json({ message: "No properties found for this category." });
     }
 
     res.status(200).json({ properties });

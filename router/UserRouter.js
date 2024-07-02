@@ -2,11 +2,14 @@ import express from "express";
 import {
   addToWishlist,
   allProperty,
+  // checkDateAvailability,
+  createBooking,
   currentUser,
   getBooking,
   getWishlist,
   login,
   payment,
+  // paymentAndBooking,
   propertyByCategory,
   propertyById,
   registerUser,
@@ -28,7 +31,10 @@ app
   .post("/wishlist/:id", addToWishlist)
   .delete("/wishlist/:id", removeFromWishlist)
   .get("/wishlist/:id", getWishlist)
-  .post("/payment", payment)
+  .post('/payment', payment)
+  .post("/booking", createBooking)
+  // .post("/check-date-availability", checkDateAvailability)
+
   .get("/booking/:id", getBooking)
   .get("/properties/category/:id", propertyByCategory);
 

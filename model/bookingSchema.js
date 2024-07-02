@@ -3,14 +3,13 @@ import mongoose from "mongoose";
 const bookingSchema = new mongoose.Schema(
   {
     title: { type: String },
-    bookingId: { type: String, required: true },
     checkInDate: { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
     numberOfGuests: { type: Number, required: true },
     amount: { type: Number, required: true },
     currency: { type: String, required: true },
     paymentDate: { type: Date, default: Date.now },
-    paymentTime: { type: String },
+    paymentTime: { type: String }, 
     receipt: { type: String, required: true },
 
     isDeleted: {

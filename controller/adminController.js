@@ -82,7 +82,7 @@ export const addProperties = async (req, res) => {
       images,
       description,
       category,
-      maxGuest
+      maxGuest,
     } = value;
     console.log(value);
 
@@ -100,7 +100,7 @@ export const addProperties = async (req, res) => {
         images,
         description,
         category,
-        maxGuest
+        maxGuest,
       });
       res.status(200).json({
         status: "Success",
@@ -177,7 +177,7 @@ export const updatePropById = async (req, res) => {
     images,
     description,
     category,
-    maxGuest
+    maxGuest,
   } = value;
 
   try {
@@ -193,7 +193,7 @@ export const updatePropById = async (req, res) => {
           images,
           description,
           category,
-          maxGuest
+          maxGuest,
         },
       },
       { new: true, runValidators: true }
@@ -241,6 +241,7 @@ export const deleteProperty = async (req, res) => {
 
 export const getAllBooking = async (req, res) => {
   try {
+    const bookingCount = await Booking.countDocuments();
     const usersWithBookings = await User.find().populate({
       path: "bookings",
       populate: { path: "property" },
@@ -272,6 +273,7 @@ export const getAllBooking = async (req, res) => {
       status: "Success",
       message: "Fetched all bookings",
       data: bookingsData,
+      dataCount: bookingCount,
     });
   } catch (error) {
     console.error("Error fetching bookings:", error);
@@ -290,14 +292,67 @@ export const totalRevenue = async (req, res) => {
         },
       },
     ]);
-    console.log(totalRevenue);
+    if (totalRevenue.length === 0) {
+      totalRevenue.push({ total: 0 });
+    }
     res.status(200).json({
       status: "Success",
       message: "Fetched the total revenue successfully",
       data: totalRevenue,
     });
-    console.log(totalRevenue);
   } catch (error) {
     res.status(500).json({ error: "Error calculating revenue" });
+  }
+};
+
+//
+
+
+export const getPropertyRevenue = async (req, res) => {
+  try {
+    const propertiesWithRevenue = await properties.aggregate([
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "_id",
+          foreignField: "property",
+          as: "bookings",
+        },
+      },
+      {
+        $unwind: "$bookings"
+      },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $first: "$title" },
+          totalRevenue: { $sum: "$bookings.amount" },
+          bookings: {
+            $push: {
+              _id: "$bookings._id",
+              checkInDate: "$bookings.checkInDate",
+              checkOutDate: "$bookings.checkOutDate"
+            }
+          }
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          totalRevenue: 1,
+          bookings: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: "Success",
+      message: "Fetched properties and their total revenue successfully",
+      data: propertiesWithRevenue,
+    });
+  } catch (error) {
+    console.error("Error fetching properties and revenue:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

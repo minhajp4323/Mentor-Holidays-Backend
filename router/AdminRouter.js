@@ -5,6 +5,7 @@ import {
   allProperties,
   deleteProperty,
   getAllBooking,
+  getPropertyRevenue,
   login,
   propertById,
   totalRevenue,
@@ -12,6 +13,7 @@ import {
   userById,
 } from "../controller/adminController.js";
 import imageUpload from "../middlewares/imageuploader/imageUploader.js";
+
 // import { verifyAdminToken } from "../middlewares/AdminAuth.js";
 
 const app = express.Router();
@@ -29,6 +31,7 @@ app
   .put("/properties/:id", imageUpload, updatePropById)
   .delete("/properties/:id", deleteProperty)
   .get("/bookings", getAllBooking)
-  .get("/total-revenue", totalRevenue);
+  .get("/total-revenue", totalRevenue)
+  .get("/property-revenue", getPropertyRevenue);
 
 export default app;
