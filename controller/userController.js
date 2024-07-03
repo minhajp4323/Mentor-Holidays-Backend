@@ -380,76 +380,7 @@ export const createBooking = async (req, res) => {
   }
 };
 
-// const razorpay = new Razorpay({
-//   key_id: process.env.RAZORPAY_KEY_ID,
-//   key_secret: process.env.RAZORPAY_SECRET,
-// });
 
-//create booking and payment
-
-// export const paymentAndBooking = async (req, res) => {
-//   const razorpay = new Razorpay({
-//     key_id: process.env.RAZOR_PAY_KEY_ID,
-//     key_secret: process.env.RAZOR_PAY_KEY_SECRET,
-//   });
-//   const {
-//     title,
-//     bookingId,
-//     checkInDate,
-//     guestNumber,
-//     checkOutDate,
-//     amount,
-//     currency,
-//     receipt,
-//     propertyId,
-//     userId,
-//   } = req.body;
-
-//   try {
-//     // Check for overlapping bookings
-//     const existingBookings = await Booking.find({ property: propertyId });
-//     for (let booking of existingBookings) {
-//       if (isDateOverlap(booking, { checkInDate, checkOutDate })) {
-//         return res.status(400).json({
-//           status: "Error",
-//           message: "Property already booked for the selected dates",
-//         });
-//       }
-//     }
-
-//     const payment = await razorpay.orders.create({ amount, currency, receipt });
-//     console.log(payment)
-
-//     const inRupees = amount / 100;
-//     const newBooking = new Booking({
-//       title,
-//       bookingId: payment.id,
-//       checkInDate,
-//       checkOutDate,
-//       numberOfGuests: guestNumber,
-//       amount: inRupees,
-//       currency,
-//       paymentDate: new Date(),
-//       receipt,
-//       user: userId,
-//       property: propertyId,
-//     });
-
-//     await newBooking.save();
-//     console.log(newBooking);
-
-//     await User.findByIdAndUpdate(userId, {
-//       $push: { bookings: newBooking._id },
-//     });
-
-//     return res
-//       .status(200)
-//       .json({ status: "Success", message: "Payment initiated", data: payment });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ error: error.message });
-//   }
-// };
 
 //get booking
 

@@ -14,7 +14,7 @@ import {
 } from "../controller/adminController.js";
 import imageUpload from "../middlewares/imageuploader/imageUploader.js";
 
-// import { verifyAdminToken } from "../middlewares/AdminAuth.js";
+import { verifyAdminToken } from "../middlewares/AdminAuth.js";
 
 const app = express.Router();
 

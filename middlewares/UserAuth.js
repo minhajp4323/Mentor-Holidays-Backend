@@ -1,12 +1,13 @@
-
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 
 export default function verifyUserToken(req, res, next) {
-  const token = req.headers["authorization"];
+  const authHeader = req.headers["authorization"];
 
-  if (!token) {
-    return res.status(403).send({ error: "No token provided" });
+  if (authHeader || !authHeader.startsWith("Bearer")) {
+    return res.status(403).json({ error: "No bearer toekn provided" });
   }
+
+  const token = authHeader.split("")[1];
 
   jwt.verify(token, process.env.USER_ACCESS_TOKEN, (err, decode) => {
     if (err) {
@@ -15,4 +16,4 @@ export default function verifyUserToken(req, res, next) {
     req.username = decode.username;
     next();
   });
-};
+}
