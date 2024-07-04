@@ -2,6 +2,7 @@ import express from "express";
 import {
   addToWishlist,
   allProperty,
+  checkDateAvailability,
   // checkDateAvailability,
   createBooking,
   currentUser,
@@ -33,7 +34,8 @@ app
   .get("/wishlist/:id", getWishlist)
   .post("/payment", payment)
   .post("/booking", createBooking)
-  // .post("/check-date-availability", checkDateAvailability)
+  .post("/check-availablity", checkDateAvailability)
+ 
 
   .get("/booking/:id", getBooking)
   .get("/properties/category/:id", propertyByCategory);

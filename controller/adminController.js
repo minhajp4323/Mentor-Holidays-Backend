@@ -4,9 +4,8 @@ import { joiPropertySchema } from "../model/validateSchema.js";
 import properties from "../model/productSchema.js";
 import Booking from "../model/BookingSchema.js";
 import User from "../model/userSchema.js";
-// import BookingModel from "../model/BookingSchema.js";
 
-//login
+
 export const login = async (req, res) => {
   const { username, password } = req.body;
   if (
@@ -15,15 +14,19 @@ export const login = async (req, res) => {
   ) {
     const token = jwt.sign(
       { username: username },
-      process.env.ADMIN_ACCESS_TOKEN
+      process.env.ADMIN_ACCESS_TOKEN,
+      { expiresIn: '1h' } 
     );
     return res.status(200).json({
       status: "Success",
-      message: "Succesfully logged in",
-      data: token,
+      message: "Successfully logged in",
+      token: token,
+      data: {
+        username: username,
+      }
     });
   } else {
-    res.status(400).json({ status: "Error", message: "incorrect admin ID" });
+    res.status(400).json({ status: "Error", message: "Incorrect admin ID" });
   }
 };
 
@@ -261,10 +264,7 @@ export const getAllBooking = async (req, res) => {
         currency: booking.currency,
         paymentDate: booking.paymentDate,
         receipt: booking.receipt,
-        // property: {
-        //   id: booking.property._id,
-        //   name: booking.property.name,
-        // },
+        
       })),
     }));
     console.log(bookingsData);

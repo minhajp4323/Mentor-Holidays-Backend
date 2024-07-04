@@ -105,8 +105,10 @@ export const login = async (req, res) => {
     }
     const token = jwt.sign(
       { username: user.username },
-      process.env.USER_ACCESS_TOKEN
+      process.env.USER_ACCESS_TOKEN,
+      { expiresIn: "1h" }
     );
+
     res.status(200).json({
       status: "Success",
       message: "Successfully logged in",
@@ -240,7 +242,7 @@ export const getWishlist = async (req, res) => {
   const userId = req.params.id;
   try {
     const user = await User.findById(userId).populate("wishlist");
-    console.log(user);
+    // console.log(user);
     if (!user) {
       return res
         .status(404)
@@ -261,6 +263,41 @@ const razorpay = new Razorpay({
   key_id: process.env.RAZOR_PAY_KEY_ID,
   key_secret: process.env.RAZOR_PAY_KEY_SECRET,
 });
+
+//DateChecking
+export const checkDateAvailability = async (req, res) => {
+  const { propertyId, checkInDate, checkOutDate } = req.body;
+
+  try {
+    const bookings = await Booking.find({
+      property: propertyId,
+      $or: [
+        {
+          checkInDate: { $lte: checkOutDate },
+          checkOutDate: { $gte: checkInDate },
+        },
+      ],
+    });
+
+    if (bookings.length > 0) {
+      return res.status(200).json({
+        status: "unavailable",
+        message: "Property is not available for the selected dates.",
+      });
+    }
+
+    return res.status(200).json({
+      status: "available",
+      message: "Property is available for the selected dates.",
+    });
+  } catch (error) {
+    console.error("Error checking date availability:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Error checking date availability.",
+    });
+  }
+};
 
 // create payment
 
@@ -308,15 +345,6 @@ export const payment = async (req, res, next) => {
   }
 };
 
-// const isDateOverlap = (existingBooking, newBooking) => {
-//   const existingStart = new Date(existingBooking.checkInDate);
-//   const existingEnd = new Date(existingBooking.checkOutDate);
-//   const newStart = new Date(newBooking.checkInDate);
-//   const newEnd = new Date(newBooking.checkOutDate);
-
-//   return (newStart < existingEnd && newEnd > existingStart);
-// };
-
 export const createBooking = async (req, res) => {
   const {
     title,
@@ -333,17 +361,6 @@ export const createBooking = async (req, res) => {
   } = req.body;
 
   try {
-    // // Check for overlapping bookings
-    // const existingBookings = await Booking.find({ property: propertyId });
-    // for (let booking of existingBookings) {
-    //   if (isDateOverlap(booking, { checkInDate, checkOutDate })) {
-    //     return res.status(400).json({
-    //       status: "error",
-    //       message: "Property already booked for the selected dates",
-    //     });
-    //   }
-    // }
-
     const newBooking = new Booking({
       title,
       bookingId: orderId,
@@ -380,8 +397,6 @@ export const createBooking = async (req, res) => {
   }
 };
 
-
-
 //get booking
 
 export const getBooking = async (req, res) => {
@@ -403,7 +418,7 @@ export const getBooking = async (req, res) => {
       message: "Fetched bookings list",
       data: user.bookings,
     });
-    console.log(user.bookings);
+    // console.log(user.bookings);
   } catch (error) {
     console.error("Error fetching booked properties:", error);
     res.status(500).json({ error: error.message });
