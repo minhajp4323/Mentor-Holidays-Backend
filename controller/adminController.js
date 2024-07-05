@@ -5,7 +5,6 @@ import properties from "../model/productSchema.js";
 import Booking from "../model/BookingSchema.js";
 import User from "../model/userSchema.js";
 
-
 export const login = async (req, res) => {
   const { username, password } = req.body;
   if (
@@ -15,7 +14,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { username: username },
       process.env.ADMIN_ACCESS_TOKEN,
-      { expiresIn: '1h' } 
+      { expiresIn: "1h" }
     );
     return res.status(200).json({
       status: "Success",
@@ -23,7 +22,7 @@ export const login = async (req, res) => {
       token: token,
       data: {
         username: username,
-      }
+      },
     });
   } else {
     res.status(400).json({ status: "Error", message: "Incorrect admin ID" });
@@ -264,7 +263,6 @@ export const getAllBooking = async (req, res) => {
         currency: booking.currency,
         paymentDate: booking.paymentDate,
         receipt: booking.receipt,
-        
       })),
     }));
     console.log(bookingsData);
@@ -307,7 +305,6 @@ export const totalRevenue = async (req, res) => {
 
 //
 
-
 export const getPropertyRevenue = async (req, res) => {
   try {
     const propertiesWithRevenue = await properties.aggregate([
@@ -320,7 +317,7 @@ export const getPropertyRevenue = async (req, res) => {
         },
       },
       {
-        $unwind: "$bookings"
+        $unwind: "$bookings",
       },
       {
         $group: {
@@ -331,9 +328,10 @@ export const getPropertyRevenue = async (req, res) => {
             $push: {
               _id: "$bookings._id",
               checkInDate: "$bookings.checkInDate",
-              checkOutDate: "$bookings.checkOutDate"
-            }
-          }
+              checkOutDate: "$bookings.checkOutDate",
+              paymentDate: "$bookings.paymentDate",
+            },
+          },
         },
       },
       {
@@ -354,5 +352,41 @@ export const getPropertyRevenue = async (req, res) => {
   } catch (error) {
     console.error("Error fetching properties and revenue:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//
+export const getRevenueByPaymentDate = async (req, res) => {
+  try {
+    const revenueData = await BookingModel.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$paymentDate" },
+          },
+          totalRevenue: { $sum: "$amount" },
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sort by date
+      },
+      {
+        $project: {
+          _id: 0,
+          date: "$_id",
+          totalRevenue: 1,
+        },
+      },
+    ]);
+
+    res.status(200).json(revenueData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
   }
 };

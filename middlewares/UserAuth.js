@@ -1,19 +1,26 @@
 import jwt from "jsonwebtoken";
 
-export default function verifyUserToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
+const verifyToken = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
 
-  if (authHeader || !authHeader.startsWith("Bearer")) {
-    return res.status(403).json({ error: "No bearer toekn provided" });
-  }
-
-  const token = authHeader.split("")[1];
-
-  jwt.verify(token, process.env.USER_ACCESS_TOKEN, (err, decode) => {
-    if (err) {
-      return res.status(401).json({ error: "unauthorization" });
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
+        return res.status(403).json({
+            error: "No token provided...!"
+        });
     }
-    req.username = decode.username;
-    next();
-  });
-}
+
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.USER_ACCESS_TOKEN, (error, decoded) => {
+        if (error) {
+            console.log(error);
+            return res.status(403).json({
+                error: "token verification failed...!"
+            })
+        }
+        req.username = decoded.username;
+        next();
+    });
+};
+
+export default verifyToken;

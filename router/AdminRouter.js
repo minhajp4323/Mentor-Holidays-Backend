@@ -6,6 +6,7 @@ import {
   deleteProperty,
   getAllBooking,
   getPropertyRevenue,
+  getRevenueByPaymentDate,
   login,
   propertById,
   totalRevenue,
@@ -32,6 +33,7 @@ app
   .delete("/properties/:id", deleteProperty)
   .get("/bookings", getAllBooking)
   .get("/total-revenue", totalRevenue)
-  .get("/property-revenue", getPropertyRevenue);
+  .get("/property-revenue", getPropertyRevenue)
+  .get('/revenue', getRevenueByPaymentDate);
 
 export default app;

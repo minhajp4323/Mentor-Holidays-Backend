@@ -17,7 +17,7 @@ import {
   removeFromWishlist,
   verifyOTP,
 } from "../controller/userController.js";
-// import verifyUserToken from "../middlewares/UserAuth.js";
+import verifyUserToken from "../middlewares/UserAuth.js";
 
 const app = express.Router();
 
@@ -27,7 +27,9 @@ app
   .post("/login", login)
   .get("/properties", allProperty)
   .get("/properties/:id", propertyById)
-  // .use(verifyUserToken)
+  
+  .use(verifyUserToken)
+  
   .get("/user/:id", currentUser)
   .post("/wishlist/:id", addToWishlist)
   .delete("/wishlist/:id", removeFromWishlist)
