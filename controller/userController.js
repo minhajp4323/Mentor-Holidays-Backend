@@ -418,7 +418,6 @@ export const getBooking = async (req, res) => {
       message: "Fetched bookings list",
       data: user.bookings,
     });
-    // console.log(user.bookings);
   } catch (error) {
     console.error("Error fetching booked properties:", error);
     res.status(500).json({ error: error.message });
