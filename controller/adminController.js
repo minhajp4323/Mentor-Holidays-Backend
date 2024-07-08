@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import users from "../model/userSchema.js";
 import { joiPropertySchema } from "../model/validateSchema.js";
 import properties from "../model/productSchema.js";
-import Booking from "../model/BookingSchema.js";
+import Booking from "../model/bookingSchema.js";
 import User from "../model/userSchema.js";
 
 export const login = async (req, res) => {
@@ -14,7 +14,7 @@ export const login = async (req, res) => {
     const token = jwt.sign(
       { username: username },
       process.env.ADMIN_ACCESS_TOKEN,
-      { expiresIn: "10h" }
+      { expiresIn: "1h" }
     );
     return res.status(200).json({
       status: "Success",
@@ -86,7 +86,7 @@ export const addProperties = async (req, res) => {
       category,
       maxGuest,
     } = value;
-    // console.log(value);
+    console.log(value);
 
     if (error) {
       res
@@ -120,7 +120,7 @@ export const addProperties = async (req, res) => {
 export const allProperties = async (req, res) => {
   try {
     const allProps = await properties.find();
-    // console.log(allProps);
+    console.log(allProps);
     if (!allProps) {
       res.status(404).json({ status: "Error", message: "No properties found" });
     } else {
@@ -265,7 +265,7 @@ export const getAllBooking = async (req, res) => {
         receipt: booking.receipt,
       })),
     }));
-    // console.log(bookingsData);
+    console.log(bookingsData);
 
     res.status(200).json({
       status: "Success",
@@ -278,7 +278,6 @@ export const getAllBooking = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 //total revenue
 
 export const totalRevenue = async (req, res) => {
@@ -357,7 +356,6 @@ export const getPropertyRevenue = async (req, res) => {
 };
 
 //
-
 export const getRevenueByPaymentDate = async (req, res) => {
   try {
     const revenueData = await Booking.aggregate([
@@ -372,18 +370,16 @@ export const getRevenueByPaymentDate = async (req, res) => {
             $dateToString: { format: "%Y-%m-%d", date: "$paymentDate" },
           },
           totalRevenue: { $sum: "$amount" },
-          // transactionCount: { $sum: 1 },
         },
       },
       {
-        $sort: { _id: 1 },
+        $sort: { _id: 1 }, // Sort by date
       },
       {
         $project: {
           _id: 0,
           date: "$_id",
           totalRevenue: 1,
-          // transactionCount: 1,
         },
       },
     ]);

@@ -4,7 +4,7 @@ import Property from "../model/productSchema.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import Booking from "../model/BookingSchema.js";
+import Booking from "../model/bookingSchema.js";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
