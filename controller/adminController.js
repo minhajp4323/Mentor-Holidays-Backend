@@ -1,7 +1,11 @@
 import jwt from "jsonwebtoken";
 import users from "../model/userSchema.js";
-import { joiPropertySchema } from "../model/validateSchema.js";
+import {
+  joiPackageSchema,
+  joiPropertySchema,
+} from "../model/validateSchema.js";
 import properties from "../model/productSchema.js";
+import packages from "../model/packagesSchema.js";
 import Booking from "../model/bookingSchema.js";
 import User from "../model/userSchema.js";
 
@@ -373,7 +377,7 @@ export const getRevenueByPaymentDate = async (req, res) => {
         },
       },
       {
-        $sort: { _id: 1 }, // Sort by date
+        $sort: { _id: 1 },
       },
       {
         $project: {
@@ -390,3 +394,59 @@ export const getRevenueByPaymentDate = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const addPackage = async (req, res) => {
+  try {
+    const { value, error } = joiPackageSchema.validate(req.body);
+    const { destination, duration, category, price, images, description } =
+      value;
+
+    if (error) {
+      console.log(error)
+      return res.status(400).json({
+        status: "error",
+        message: error.details[0].message,
+      });
+    }
+
+    const addedPackage = await packages.create({
+      destination,
+      duration,
+      category,
+      price,
+      images,
+      description,
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Package added successfully",
+      data: addedPackage,
+    });
+    console.log(addedPackage)
+  } catch (err) {
+    console.error("Error adding package:", err);
+    res.status(500).json({
+      status: "error",
+      message: "An error occurred while adding the package",
+    });
+  }
+};
+
+
+// export const allPackages = async (req, res) => {
+//   try {
+//     const allPacks = await packages.find();
+//     if (!allPacks) {
+//       res.status(404).json({ status: "Error", message: "No packages found" });
+//     } else {
+//       res.status(200).json({
+//         status: "Success",
+//         message: "Fetched all Packages successfully",
+//         data: allPacks,
+//       });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };

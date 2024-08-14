@@ -21,3 +21,13 @@ export const joiPropertySchema = Joi.object({
   category: Joi.string(),
   maxGuest: Joi.string(),
 });
+
+export const joiPackageSchema = Joi.object({
+  destination: Joi.string().required(),
+  duration: Joi.number().required(),
+  category: Joi.string().required(),
+  price: Joi.number().required(),
+
+  images: Joi.array().items(Joi.string()),
+  description: Joi.string(),
+});

@@ -1,7 +1,9 @@
 import express from "express";
 import {
   AllUser,
+  addPackage,
   addProperties,
+  // allPackages,
   allProperties,
   deleteProperty,
   getAllBooking,
@@ -34,6 +36,9 @@ app
   .get("/bookings", getAllBooking)
   .get("/total-revenue", totalRevenue)
   .get("/property-revenue", getPropertyRevenue)
-  .get('/revenue', getRevenueByPaymentDate);
+  .get("/revenue", getRevenueByPaymentDate)
+  //pakages
+  .post("/package", imageUpload, addPackage)
+  // .get("/package", allPackages);
 
 export default app;

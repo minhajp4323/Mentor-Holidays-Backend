@@ -6,7 +6,7 @@ import path from "path";
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 
-dotenv.config()
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -29,7 +29,6 @@ cloudinary.config({
 });
 
 const imageUpload = (req, res, next) => {
-  console.log("Starting image upload middleware");
   upload.array("images", 10)(req, res, async (error) => {
     if (error) {
       return res.status(400).json({
@@ -37,7 +36,7 @@ const imageUpload = (req, res, next) => {
         message: error.message,
       });
     }
-    console.log("Files uploaded:", req.files); // Add this line for debugging
+
     if (!req.files) {
       return res.status(400).json({
         status: "error",

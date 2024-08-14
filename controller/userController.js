@@ -10,6 +10,7 @@ import crypto from "crypto";
 
 import { sendOTP } from "../utility/Mailer.js";
 import { title } from "process";
+import packagesSchema from "../model/packagesSchema.js";
 
 const otpStore = new Map();
 
@@ -442,5 +443,23 @@ export const propertyByCategory = async (req, res) => {
   } catch (error) {
     console.error("Error fetching properties by category:", error);
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const Packages = async (req, res) => {
+  try {
+    const allPacks = await packagesSchema.find();
+    console.log(allPacks)
+    if (!allPacks) {
+      res.status(404).json({ status: "Error", message: "No packages found" });
+    } else {
+      res.status(200).json({
+        status: "Success",
+        message: "Fetched all Packages successfully",
+        data: allPacks,
+      });
+    }
+  } catch (err) {
+    console.error(err);
   }
 };

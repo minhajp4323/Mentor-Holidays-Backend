@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addToWishlist,
+  Packages,
   allProperty,
   checkDateAvailability,
   createBooking,
@@ -25,6 +26,7 @@ app
   .post("/login", login)
   .get("/properties", allProperty)
   .get("/properties/:id", propertyById)
+  .get('/package', Packages)
   
   .use(verifyUserToken)
   

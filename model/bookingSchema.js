@@ -9,7 +9,7 @@ const bookingSchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     currency: { type: String, required: true },
     paymentDate: { type: Date, default: Date.now },
-    paymentTime: { type: String }, 
+    paymentTime: { type: String },
     receipt: { type: String, required: true },
 
     isDeleted: {
