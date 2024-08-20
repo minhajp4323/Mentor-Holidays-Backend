@@ -446,10 +446,10 @@ export const propertyByCategory = async (req, res) => {
   }
 };
 
-export const Packages = async (req, res) => {
+export const packages = async (req, res) => {
   try {
     const allPacks = await packagesSchema.find();
-    console.log(allPacks)
+    // console.log(allPacks)
     if (!allPacks) {
       res.status(404).json({ status: "Error", message: "No packages found" });
     } else {
@@ -461,5 +461,27 @@ export const Packages = async (req, res) => {
     }
   } catch (err) {
     console.error(err);
+  }
+};
+
+export const PackageById = async (req, res) => {
+  try {
+    const packId = req.params.id;
+    const packById = await packagesSchema.findById(packId);
+    if (!packById) {
+      return res.status(404).json({
+        status: "Not found",
+        message: "Package not found in the database",
+      });
+    }
+    res.status(200).json({
+      status: "Success",
+      message: "Successfully fetched package by ID",
+      data: packById,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+    // res.status(500).json({ error: "Minhaj" });
   }
 };

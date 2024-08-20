@@ -9,8 +9,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const app = express();
-const PORT = 3333;  
-const mongodb ="mongodb+srv://minhajsam1233:mentorpass@mentor.r7t4xhq.mongodb.net/mentor-holidays";
+const PORT = 3333;
+const mongodb =
+  "mongodb+srv://minhajsam1233:mentorpass@mentor.r7t4xhq.mongodb.net/mentor-holidays";
 // const mongodb = "mongodb://localhost:27017/MentorHolidays";
 
 mongoose.connect(mongodb).then(console.log("Connected to db"));

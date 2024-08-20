@@ -1,7 +1,7 @@
 import express from "express";
 import {
   addToWishlist,
-  Packages,
+  packages,
   allProperty,
   checkDateAvailability,
   createBooking,
@@ -15,6 +15,7 @@ import {
   registerUser,
   removeFromWishlist,
   verifyOTP,
+  PackageById,
 } from "../controller/userController.js";
 import verifyUserToken from "../middlewares/UserAuth.js";
 
@@ -26,10 +27,11 @@ app
   .post("/login", login)
   .get("/properties", allProperty)
   .get("/properties/:id", propertyById)
-  .get('/package', Packages)
-  
+  .get("/package", packages)
+  .get("/package/:id", PackageById)
+
   .use(verifyUserToken)
-  
+
   .get("/user/:id", currentUser)
   .post("/wishlist/:id", addToWishlist)
   .delete("/wishlist/:id", removeFromWishlist)
@@ -37,7 +39,6 @@ app
   .post("/payment", payment)
   .post("/booking", createBooking)
   .post("/check-availablity", checkDateAvailability)
- 
 
   .get("/booking/:id", getBooking)
   .get("/properties/category/:id", propertyByCategory);
