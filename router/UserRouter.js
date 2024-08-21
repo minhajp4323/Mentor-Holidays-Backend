@@ -15,9 +15,9 @@ import {
   registerUser,
   removeFromWishlist,
   verifyOTP,
-  PackageById,
 } from "../controller/userController.js";
 import verifyUserToken from "../middlewares/UserAuth.js";
+import { PackageById } from "../controller/packageController.js";
 
 const app = express.Router();
 

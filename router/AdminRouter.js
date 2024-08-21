@@ -1,9 +1,7 @@
 import express from "express";
 import {
   AllUser,
-  addPackage,
   addProperties,
-  // allPackages,
   allProperties,
   deleteProperty,
   getAllBooking,
@@ -18,6 +16,7 @@ import {
 import imageUpload from "../middlewares/imageuploader/imageUploader.js";
 
 import { verifyAdminToken } from "../middlewares/AdminAuth.js";
+import { addPackage, allPackages, updatePackageById } from "../controller/packageController.js";
 
 const app = express.Router();
 
@@ -39,6 +38,7 @@ app
   .get("/revenue", getRevenueByPaymentDate)
   //pakages
   .post("/package", imageUpload, addPackage)
-  // .get("/package", allPackages);
+  .get("/package", allPackages)
+  .put("/package/:id", updatePackageById);
 
 export default app;
