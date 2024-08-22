@@ -21,7 +21,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(express.json());
+
 
 app.use("/api/admin", AdminRouter);
 app.use("/api/user", UserRouter);

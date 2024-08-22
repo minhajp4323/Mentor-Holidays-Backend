@@ -16,7 +16,11 @@ import {
 import imageUpload from "../middlewares/imageuploader/imageUploader.js";
 
 import { verifyAdminToken } from "../middlewares/AdminAuth.js";
-import { addPackage, allPackages, updatePackageById } from "../controller/packageController.js";
+import {
+  addPackage,
+  allPackages,
+  updatePackageById,
+} from "../controller/packageController.js";
 
 const app = express.Router();
 
@@ -39,6 +43,6 @@ app
   //pakages
   .post("/package", imageUpload, addPackage)
   .get("/package", allPackages)
-  .put("/package/:id", updatePackageById);
+  .put("/package/:id", imageUpload, updatePackageById);
 
 export default app;

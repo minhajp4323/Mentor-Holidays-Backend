@@ -79,51 +79,49 @@ export const PackageById = async (req, res) => {
 };
 
 export const updatePackageById = async (req, res) => {
-    console.log('Request body:', req.body); // Log the incoming request body
-  
-    const packId = req.params.id;
-    const { value, error } = joiPackageSchema.validate(req.body);
-    const { destination, duration, category, price, images, description } = value;
-  
-    if (error) {
-      return res
-        .status(404)
-        .json({ status: "Not found", message: error.details[0].message });
-    }
-  
-    try {
-      const updatedPackage = await packagesSchema.findByIdAndUpdate(
-        packId,
-        {
-          $set: {
-            destination,
-            duration,
-            category,
-            price,
-            images,
-            description,
-          },
+  const packId = req.params.id;
+
+  const { value, error } = joiPackageSchema.validate(req.body);
+  const { destination, duration, category, price, images, description } = value;
+
+  if (error) {
+    return res
+      .status(404)
+      .json({ status: "Not found", message: error.details[0].message });
+  }
+
+  try {
+    const updatedPackage = await packagesSchema.findByIdAndUpdate(
+      packId,
+      {
+        $set: {
+          destination,
+          duration,
+          category,
+          price,
+          images,
+          description,
         },
-        { new: true, runValidators: true }
-      );
-      if (updatedPackage) {
-        res.status(200).json({
-          status: "Success",
-          message: "Updated Successfully",
-          data: updatedPackage,
-        });
-      } else {
-        res.status(404).json({
-          status: "error",
-          message: "No package found",
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({
+      },
+      { new: true, runValidators: true }
+    );
+    if (updatedPackage) {
+      res.status(200).json({
+        status: "Success",
+        message: "Updated Successfully",
+        data: updatedPackage,
+      });
+    } else {
+      res.status(404).json({
         status: "error",
-        message: "An error occurred while updating the package",
+        message: "No package found",
       });
     }
-  };
-  
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: "An error occurred while updating the package",
+    });
+  }
+};
