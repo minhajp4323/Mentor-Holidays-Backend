@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import AdminRouter from "./router/AdminRouter.js";
 import UserRouter from "./router/UserRouter.js";
 import cors from "cors";
+import morgan from "morgan";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -15,16 +16,9 @@ const mongodb =
 // const mongodb = "mongodb://localhost:27017/MentorHolidays";
 
 mongoose.connect(mongodb).then(console.log("Connected to db"));
-
+app.use(morgan("dev"));
 app.use(express.json());
-app.use(
-  cors({
-    origin:
-      "mentor-holidays-frontend-10g2ec0uj-minhajp4323s-projects.vercel.app",
-    methods: ["PUT", "POST", "DELETE", "GET", "PATCH"],
-    allowedHeaders:["Content-Type", "Authorization"]
-  })
-);
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
