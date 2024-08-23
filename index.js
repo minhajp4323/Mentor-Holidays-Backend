@@ -17,11 +17,14 @@ const mongodb =
 mongoose.connect(mongodb).then(console.log("Connected to db"));
 
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://vercel.com/minhajp4323s-projects/mentor-holidays-frontend",
+    credentials: ["POST", "GET", "PATCH", "PUT"],
+  })
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-
 
 app.use("/api/admin", AdminRouter);
 app.use("/api/user", UserRouter);
