@@ -41,6 +41,6 @@ app
   .post("/check-availablity", checkDateAvailability)
 
   .get("/booking/:id", getBooking)
-  .get("/properties/category/:id", propertyByCategory);
+  // .get("/properties/category/:id", propertyByCategory);
 
 export default app;

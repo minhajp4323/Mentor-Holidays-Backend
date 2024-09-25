@@ -19,6 +19,7 @@ import { verifyAdminToken } from "../middlewares/AdminAuth.js";
 import {
   addPackage,
   allPackages,
+  deletePackage,
   updatePackageById,
 } from "../controller/packageController.js";
 
@@ -43,6 +44,7 @@ app
   //pakages
   .post("/package", imageUpload, addPackage)
   .get("/package", allPackages)
-  .put("/package/:id", imageUpload, updatePackageById);
+  .put("/package/:id", imageUpload, updatePackageById)
+  .delete("/package/:id", deletePackage);
 
 export default app;

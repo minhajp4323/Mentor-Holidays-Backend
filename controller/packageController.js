@@ -86,8 +86,8 @@ export const updatePackageById = async (req, res) => {
 
   if (error) {
     return res
-      .status(404)
-      .json({ status: "Not found", message: error.details[0].message });
+      .status(400)
+      .json({ status: "Validation Error", message: error.details[0].message });
   }
 
   try {
@@ -105,23 +105,46 @@ export const updatePackageById = async (req, res) => {
       },
       { new: true, runValidators: true }
     );
+
     if (updatedPackage) {
-      res.status(200).json({
+      return res.status(200).json({
         status: "Success",
         message: "Updated Successfully",
         data: updatedPackage,
       });
     } else {
-      res.status(404).json({
-        status: "error",
+      return res.status(404).json({
+        status: "Error",
         message: "No package found",
       });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: "error",
+    console.error("Error during package update:", error.message || error);
+    return res.status(500).json({
+      status: "Error",
       message: "An error occurred while updating the package",
+    });
+  }
+};
+
+
+export const deletePackage = async (req, res) => {
+  const packId = req.params.id;
+  if (!packId) {
+    res
+      .status(404)
+      .json({ status: "Not found", message: "Product not found in db" });
+  }
+  const deletedPackage = await packagesSchema.findByIdAndDelete(packId);
+
+  if (!deletedPackage) {
+    res
+      .status(404)
+      .json({ status: "Error", message: "Error while deleting property" });
+  } else {
+    res.status(404).json({
+      status: "Success",
+      message: "Successfully deleted the property",
     });
   }
 };
