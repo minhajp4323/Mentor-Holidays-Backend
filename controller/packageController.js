@@ -29,7 +29,6 @@ export const addPackage = async (req, res) => {
       message: "Package added successfully",
       data: addedPackage,
     });
-    console.log(addedPackage);
   } catch (err) {
     console.error("Error adding package:", err);
     res.status(500).json({

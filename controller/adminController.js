@@ -90,7 +90,6 @@ export const addProperties = async (req, res) => {
       category,
       maxGuest,
     } = value;
-    console.log(value);
 
     if (error) {
       res
@@ -119,12 +118,11 @@ export const addProperties = async (req, res) => {
   }
 };
 
-// Display all properties
+// Display all properties 
 
 export const allProperties = async (req, res) => {
   try {
     const allProps = await properties.find();
-    console.log(allProps);
     if (!allProps) {
       res.status(404).json({ status: "Error", message: "No properties found" });
     } else {
@@ -269,7 +267,7 @@ export const getAllBooking = async (req, res) => {
         receipt: booking.receipt,
       })),
     }));
-    console.log(bookingsData);
+    // console.log(bookingsData);
 
     res.status(200).json({
       status: "Success",

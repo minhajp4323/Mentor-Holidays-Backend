@@ -243,7 +243,6 @@ export const getWishlist = async (req, res) => {
   const userId = req.params.id;
   try {
     const user = await User.findById(userId).populate("wishlist");
-    // console.log(user);
     if (!user) {
       return res
         .status(404)
@@ -427,7 +426,7 @@ export const getBooking = async (req, res) => {
 
 //property by category
 
-export const propertyByCategory = async (req, res) => {
+export const propertyByCategory = async (req, res) => { 
   const categoryId = req.params.id;
 
   try {
@@ -449,7 +448,6 @@ export const propertyByCategory = async (req, res) => {
 export const packages = async (req, res) => {
   try {
     const allPacks = await packagesSchema.find();
-    // console.log(allPacks)
     if (!allPacks) {
       res.status(404).json({ status: "Error", message: "No packages found" });
     } else {
